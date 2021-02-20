@@ -16,6 +16,7 @@ public class NCP implements Application.ActivityLifecycleCallbacks {
     public static boolean isEnableActivityFloatView = true; //是否允许显示浮窗，默认允许
     private boolean isShowFloatView = true;
     private Activity currentActivity;
+
     public static NCP init(Application application) {
         if (sNCP == null) {
             synchronized (NCP.class) {
@@ -32,8 +33,8 @@ public class NCP implements Application.ActivityLifecycleCallbacks {
         init();
     }
 
-    public static NCP getInstance(){
-        if (sNCP==null)throw new RuntimeException("请先初始化->NCP.init()");
+    public static NCP getInstance() {
+        if (sNCP == null) throw new RuntimeException("请先初始化->NCP.init()");
         return sNCP;
     }
 
@@ -59,7 +60,7 @@ public class NCP implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
         currentActivity = activity;
-        if (activity.getClass().getName().equals(NetCaptureRecordActivity.class.getName()) || !BuildConfig.DEBUG) {
+        if (activity.getClass().getName().equals(NetCaptureRecordActivity.class.getName()) || !isShowFloatView) {
             return;
         }
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
