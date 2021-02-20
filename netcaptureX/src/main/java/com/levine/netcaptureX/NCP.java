@@ -14,8 +14,9 @@ public class NCP implements Application.ActivityLifecycleCallbacks {
     public static float coordinateX = 0;
     public static float coordinateY = ScreenUtils.getScreenHeight() / 2 / 2;
     public static boolean isEnableActivityFloatView = true; //是否允许显示浮窗，默认允许
-
-    public static NCP getInstance(Application application) {
+    private boolean isShowFloatView = true;
+    private Activity currentActivity;
+    public static NCP init(Application application) {
         if (sNCP == null) {
             synchronized (NCP.class) {
                 if (sNCP == null) {
@@ -28,15 +29,36 @@ public class NCP implements Application.ActivityLifecycleCallbacks {
 
     private NCP(Application application) {
         mApplication = application;
+        init();
     }
 
-    public void init() {
+    public static NCP getInstance(){
+        if (sNCP==null)throw new RuntimeException("请先初始化->NCP.init()");
+        return sNCP;
+    }
+
+    private void init() {
         if (isInitialized) return;
         mApplication.registerActivityLifecycleCallbacks(this);
     }
 
+    public boolean isShowFloatView() {
+        return isShowFloatView;
+    }
+
+    public void setShowFloatView(boolean showFloatView) {
+        isShowFloatView = showFloatView;
+        if (currentActivity == null || !isShowFloatView) return;
+        ViewGroup decorView = (ViewGroup) currentActivity.getWindow().getDecorView();
+        FloatView floatView = new FloatView(currentActivity);
+        floatView.setTag(currentActivity.getClass().getName());
+        floatView.setCoordinate(coordinateX, coordinateY);
+        decorView.addView(floatView);
+    }
+
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        currentActivity = activity;
         if (activity.getClass().getName().equals(NetCaptureRecordActivity.class.getName()) || !BuildConfig.DEBUG) {
             return;
         }
